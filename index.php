@@ -25,26 +25,28 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
         if (in_array(htmlspecialchars($_GET['course']), $tutor->courses) || htmlspecialchars($_GET['course']) == 'all' || htmlspecialchars($_GET['course']) == NULL) {// return based on value of course selection menu
 
             if ($tutor->location == locationNameToCode() || htmlspecialchars($_GET['location']) == 'all' || htmlspecialchars($_GET['location']) == NULL) {// check if location matches selections in location selection menu
-                if ($tutor->location == 'G'){//these are pretty ugly and could be combined with the locationNameToCode() function somehow.
-                    $text .= '<b>GRIP Center:</b><br>';
-                }
-                else if ($tutor->location == 'L'){
-                    $text .= '<b>Library:</b><br>';
-                }
-                else if ($tutor->location == 'S'){
-                    $text .= '<b>Student Center Lounge:</b><br>';
-                }
-                else if ($tutor->location == 'B'){
-                    $text .= '<b>Beckley Campus:</b><br>';
-                }
-                $text .= $tutor->firstName . ' ' . $tutor->lastName . ': ';
-                foreach ($tutor->courses as $course) {
-                    if ($course != NULL) {
-                        $text .= ' ' . $course . ',';
+                if (htmlspecialchars($_GET['tutor']) == ($tutor->firstName . ' ' . $tutor->lastName) || htmlspecialchars($_GET['tutor']) == 'all' || htmlspecialchars($_GET['tutor']) == NULL) {
+                    if ($tutor->location == 'G'){//these are pretty ugly and could be combined with the locationNameToCode() function somehow.
+                        $text .= '<b>GRIP Center:</b><br>';
                     }
+                    else if ($tutor->location == 'L'){
+                        $text .= '<b>Library:</b><br>';
+                    }
+                    else if ($tutor->location == 'S'){
+                        $text .= '<b>Student Center Lounge:</b><br>';
+                    }
+                    else if ($tutor->location == 'B'){
+                        $text .= '<b>Beckley Campus:</b><br>';
+                    }
+                    $text .= $tutor->firstName . ' ' . $tutor->lastName . ': ';
+                    foreach ($tutor->courses as $course) {
+                        if ($course != NULL) {
+                            $text .= ' ' . $course . ',';
+                        }
+                    }
+                    $text = rtrim($text, ',');// remove last comma.
+                    $text .= '<br><br>';
                 }
-                $text = rtrim($text, ',');// remove last comma.
-                $text .= '<br><br>';
             }
         }
     }
@@ -69,7 +71,11 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                             <option value="all">All Courses</option>
                             <?php
                                 foreach (getAllCourses() as $course) {// this is pretty ugly.  Should it get its own function or would that be too much for something this small?
-                                    echo '<option '; if (htmlspecialchars($_GET['course']) == $course) {echo 'selected';} echo " value=\"$course\">$course</option>";
+                                    echo '<option ';
+                                    if (htmlspecialchars($_GET['course']) == $course) {
+                                        echo 'selected';
+                                    }
+                                    echo " value=\"$course\">$course</option>";
                                 }
                             ?>
                         </select>
@@ -79,6 +85,18 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                             <option <?php if (htmlspecialchars($_GET['location']) == 'Library') {echo 'selected';} ?> value="Library">Library</option>
                             <option <?php if (htmlspecialchars($_GET['location']) == 'Student Center') {echo 'selected';} ?> value="Student Center">Student Center Study Lounge</option>
                             <option <?php if (htmlspecialchars($_GET['location']) == 'Beckley') {echo 'selected';} ?> value="Beckley">Beckley Campus</option>
+                        </select>
+                        <select class="ui selection dropdown" name="tutor">
+                            <option value="all">All Tutors</option>
+                            <?php
+                                foreach (getAllTutors() as $tutor) {
+                                    echo '<option ';
+                                    if (htmlspecialchars($_GET['tutor']) == $tutor->firstName . ' ' . $tutor->lastName) {
+                                        echo 'selected';
+                                    }
+                                    echo ' value="' . $tutor->firstName . ' ' . $tutor->lastName . '">' . $tutor->firstName . ' ' . $tutor->lastName . '</option>';
+                                }
+                            ?>
                         </select>
                         <button class="ui right floated primary button" type="submit">Filter</button>
                     </form>
