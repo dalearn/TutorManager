@@ -4,8 +4,9 @@ class TimeSlot {
     public $day;// M/T/W/R
     public $startTime;// 24-hr time
     public $endTime;// 24-hr time
+    public $location;// see excel file/documentation for letter codes
 
-    public function set($input) {// takes data in format: day-start time-end time.  Could benefit from more error-checking
+    public function set($input) {// takes data in format: day-start time-end time-location code.  Could benefit from more error-checking
         $data = explode('-', $input);
         if ($data[0] == 'M' || $data[0] == 'T' || $data[0] == 'W' || $data[0] == 'R') {// make sure day is valid
             $this->day = $data[0];
@@ -20,7 +21,13 @@ class TimeSlot {
         else {
             return false;// error
         }
-        return true;
+        if ($data[3] == 'G' || $data[3] == 'L' || $data[3] == 'S' || $data[3] == 'B') {
+            $this->location = $data[3];
+        }
+        else {
+            return false;// error
+        }
+        return true;// all data was valid and all variables have been initialized
     }
 }
 
@@ -29,9 +36,10 @@ class Tutor {
     public $lastName = '';
     public $courses = array();
     public $times = array();
+    //public $location;//only used when specifc timeslots are being passed around.
 }
 
-function getAllTutors() {
+function getAllTutors() {// This function gets called a lot.  It may be necessary to do something with static or otherwise limit the number of file reads.
     // tutor data
     $tutorData = array();
     foreach (explode(PHP_EOL, file_get_contents('data/tutors.csv')) as $line) {// break file into individual lines
@@ -44,7 +52,7 @@ function getAllTutors() {
     foreach (explode(PHP_EOL, file_get_contents('data/times.csv')) as $line) {// break file into individual lines
         array_push($timeData, explode(',', $line));
     }
-    unset($timeData[0]);// remove table headers
+    unset($timeData[0]);// remove header row
 
     // parsing/validating
     $tutors = array();
@@ -55,6 +63,7 @@ function getAllTutors() {
             if (strlen($line[1]) > 0) {// Last Name
                 $tutor->lastName = $line[1];
                 foreach (array_slice($line, 2) as $course) {// individual courses
+                    $course = rtrim($course);//remove any whitespace that may sneak into the file such as newlines or trailing spaces
                     array_push($tutor->courses, $course);
                 }
                 foreach ($timeData as $timeRow) {
@@ -75,12 +84,27 @@ function getAllTutors() {
     return $tutors;
 }
 
+function getAllCourses() {
+    $tutors = getAllTutors();
+    $courses = array();
+    foreach ($tutors as $tutor) {
+        foreach ($tutor->courses as $course) {
+            if(!in_array($course, $courses) && $course != NULL){
+                array_push($courses, $course);
+            }
+        }
+    }
+    sort($courses);
+    return $courses;
+}
+
 function selectTutorsByTime($day, $startTime, $endTime) {// day: M/T/W/R, start/end time: 24-hr
     $selection = array();
     $tutors = getAllTutors();
     foreach ($tutors as $tutor) {
         foreach ($tutor->times as $time) {
-        if ($time->day == $day && $time->endTime > $startTime && $time->startTime < $endTime) {
+            if ($time->day == $day && $time->endTime > $startTime && $time->startTime < $endTime) {
+                $tutor->location = $time->location;
                 array_push($selection, $tutor);
             }
         }
