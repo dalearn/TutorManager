@@ -5,6 +5,7 @@ class TimeSlot {
     public $startTime;// 24-hr time
     public $endTime;// 24-hr time
     public $location;// see excel file/documentation for letter codes
+    public $studyGroupName = '';// will be left blank for no study group this time slot
 
     public function set($input) {// takes data in format: day-start time-end time-location code.  Could benefit from more error-checking
         $data = explode('-', $input);
@@ -27,6 +28,9 @@ class TimeSlot {
         else {
             return false;// error
         }
+        if ($data[4] != '') {
+            $this->studyGroupName = $data[4];
+        }
         return true;// all data was valid and all variables have been initialized
     }
 }
@@ -36,7 +40,8 @@ class Tutor {
     public $lastName = '';
     public $courses = array();
     public $times = array();
-    //public $location;//only used when specifc timeslots are being passed around.
+    public $location;//only used when specifc timeslots are being passed around.
+    public $studyGroupName;//only used when specifc timeslots are being passed around.
 }
 
 function getAllTutors() {// This function gets called a lot.  It may be necessary to do something with static or otherwise limit the number of file reads.
@@ -105,6 +110,7 @@ function selectTutorsByTime($day, $startTime, $endTime) {// day: M/T/W/R, start/
         foreach ($tutor->times as $time) {
             if ($time->day == $day && $time->endTime > $startTime && $time->startTime < $endTime) {
                 $tutor->location = $time->location;
+                $tutor->studyGroupName = $time->studyGroupName;
                 array_push($selection, $tutor);
             }
         }

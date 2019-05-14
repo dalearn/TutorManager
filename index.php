@@ -1,7 +1,7 @@
 <?php
 include 'data.php';
 
-function locationNameToCode() {// special helper function for the location dropdown.  This could certainly become an enum or similar.
+function locationNameToCode() {// special helper function for the location dropdown.
     $location = htmlspecialchars($_GET['location']);
     if ($location == 'GRIP') {
         return 'G';
@@ -25,7 +25,7 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
         if (in_array(htmlspecialchars($_GET['course']), $tutor->courses) || htmlspecialchars($_GET['course']) == 'all' || htmlspecialchars($_GET['course']) == NULL) {// return based on value of course selection menu
 
             if ($tutor->location == locationNameToCode() || htmlspecialchars($_GET['location']) == 'all' || htmlspecialchars($_GET['location']) == NULL) {// check if location matches selections in location selection menu
-                if (htmlspecialchars($_GET['tutor']) == ($tutor->firstName . ' ' . $tutor->lastName) || htmlspecialchars($_GET['tutor']) == 'all' || htmlspecialchars($_GET['tutor']) == NULL) {
+                if (htmlspecialchars($_GET['tutor']) == ($tutor->firstName . ' ' . $tutor->lastName) || htmlspecialchars($_GET['tutor']) == 'all' || htmlspecialchars($_GET['tutor']) == NULL) {// search by tutor name
                     if ($tutor->location == 'G'){//these are pretty ugly and could be combined with the locationNameToCode() function somehow.
                         $text .= '<b>GRIP Center:</b><br>';
                     }
@@ -39,17 +39,23 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                         $text .= '<b>Beckley Campus:</b><br>';
                     }
                     $text .= $tutor->firstName . ' ' . $tutor->lastName . ': ';
-                    foreach ($tutor->courses as $course) {
-                        if ($course != NULL) {
-                            $text .= ' ' . $course . ',';
+                    if ($tutor->studyGroupName != NULL) {
+                        $text .= $tutor->studyGroupName;
+                    }
+                    else {
+                        foreach ($tutor->courses as $course) {
+                            if ($course != NULL) {
+                                $text .= ' ' . $course . ',';
+                            }
                         }
                     }
-                    $text = rtrim($text, ',');// remove last comma.
+                    $text = rtrim($text, ',');// remove trailing commas.
                     $text .= '<br><br>';
                 }
             }
         }
     }
+    $text = rtrim($text, '<br>');//remove trailing <br>
     return $text;
 }
 
@@ -70,7 +76,7 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                         <select class="ui selection dropdown" name="course">
                             <option value="all">All Courses</option>
                             <?php
-                                foreach (getAllCourses() as $course) {// this is pretty ugly.  Should it get its own function or would that be too much for something this small?
+                                foreach (getAllCourses() as $course) {
                                     echo '<option ';
                                     if (htmlspecialchars($_GET['course']) == $course) {
                                         echo 'selected';
