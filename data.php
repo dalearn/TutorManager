@@ -5,7 +5,7 @@ class TimeSlot {
     public $startTime;// 24-hr time
     public $endTime;// 24-hr time
     public $location;// see excel file/documentation for letter codes
-    public $studyGroupName = '';// will be left blank for no study group this time slot
+    public $studyGroupName = '';// will be left blank if no study group for this time slot
 
     public function set($input) {// takes data in format: day-start time-end time-location code.  Could benefit from more error-checking
         $data = explode('-', $input);

@@ -1,5 +1,8 @@
 <?php
 include 'data.php';
+include 'config.php';
+
+$config = new TutorManagerConfig();
 
 function locationNameToCode() {// special helper function for the location dropdown.
     $location = htmlspecialchars($_GET['location']);
@@ -70,6 +73,7 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
     </head>
     <body>
         <div class="ui container" style="margin-top: 1.5em;">
+            <h1 class="ui header"><?php echo $config->semesterName ?> Drop-In Tutoring Schedule</h1>
             <div class="ui segment">
                 <div class="ui segment">
                     <form action="" method="get">
@@ -107,7 +111,7 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                         <button class="ui right floated primary button" type="submit">Filter</button>
                     </form>
                 </div>
-                <table class="ui celled striped definition table">
+                <table class="ui unstackable celled striped definition table">
                     <thead>
                         <tr>
                             <th class="one wide"></th>
