@@ -6,10 +6,7 @@ $config = new TutorManagerConfig();
 
 function locationNameToCode() {// special helper function for the location dropdown.
     $location = htmlspecialchars($_GET['location']);
-    if ($location == 'GRIP') {
-        return 'G';
-    }
-    else if ($location == 'Library') {
+    if ($location == 'Library') {
         return 'L';
     }
     else if ($location == 'Student Center') {
@@ -23,25 +20,33 @@ function locationNameToCode() {// special helper function for the location dropd
 function generateTableCell($day, $timeSlot) {// generate the actual text to go in each table cell
     $selection = selectTutorsByTime($day, $timeSlot, $timeSlot + 1);
 
+    $L = false;// used to tell if that location has already been entered.
+    $S = false;
+    $B = false;
+
     $text = '';
     foreach ($selection as $tutor) {
         if (in_array(htmlspecialchars($_GET['course']), $tutor->courses) || htmlspecialchars($_GET['course']) == 'all' || htmlspecialchars($_GET['course']) == NULL) {// return based on value of course selection menu
 
             if ($tutor->location == locationNameToCode() || htmlspecialchars($_GET['location']) == 'all' || htmlspecialchars($_GET['location']) == NULL) {// check if location matches selections in location selection menu
-                if (htmlspecialchars($_GET['tutor']) == ($tutor->firstName . ' ' . $tutor->lastName) || htmlspecialchars($_GET['tutor']) == 'all' || htmlspecialchars($_GET['tutor']) == NULL) {// search by tutor name
-                    if ($tutor->location == 'G'){//these are pretty ugly and could be combined with the locationNameToCode() function somehow.
-                        $text .= '<b>GRIP Center:</b><br>';
+                if (htmlspecialchars($_GET['tutor']) == ($tutor->firstName . ' ' . mb_substr($tutor->lastName, 0, 1, 'utf-8')) || htmlspecialchars($_GET['tutor']) == 'all' || htmlspecialchars($_GET['tutor']) == NULL) {// search by tutor name
+                    if (!(!$L && !$S && !$B)) {
+                        $text .= '<br>';
                     }
-                    else if ($tutor->location == 'L'){
-                        $text .= '<b>Library:</b><br>';
+
+                    if ($tutor->location == 'L' && !$L){//these are pretty ugly and could be combined with the locationNameToCode() function somehow.
+                        $text .= '<b><a onclick="showLocationModal(\'L\')">Library:</a></b><br>';
+                        $L = true;
                     }
-                    else if ($tutor->location == 'S'){
-                        $text .= '<b>Student Center Lounge:</b><br>';
+                    else if ($tutor->location == 'S' && !$S){
+                        $text .= '<b><a onclick="showLocationModal(\'S\')">Student Center Lounge:</a></b><br>';
+                        $S = true;
                     }
-                    else if ($tutor->location == 'B'){
-                        $text .= '<b>Beckley Campus:</b><br>';
+                    else if ($tutor->location == 'B' && !$B){
+                        $text .= '<b><a onclick="showLocationModal(\'B\')">Beckley Campus:</a></b><br>';
+                        $B = true;
                     }
-                    $text .= $tutor->firstName . ' ' . $tutor->lastName . ': ';
+                    $text .= "<b>" . $tutor->firstName . ' ' . mb_substr($tutor->lastName, 0, 1, 'utf-8') . ':</b> ';
                     if ($tutor->studyGroupName != NULL) {
                         $text .= $tutor->studyGroupName;
                     }
@@ -53,7 +58,7 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                         }
                     }
                     $text = rtrim($text, ',');// remove trailing commas.
-                    $text .= '<br><br>';
+                    $text .= '<br>';
                 }
             }
         }
@@ -68,7 +73,39 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
     <head>
         <meta charset="UTF-8">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.js"></script>
+        <script>
+            function showLocationModal(locationCode) {
+                if (locationCode == 'L') {
+                    $('.ui.modal.library')
+                        .modal('show')
+                    ;
+                }
+                else if (locationCode == 'S') {
+                    $('.ui.modal.studentCenter')
+                        .modal('show')
+                    ;
+                }
+                else if (locationCode == 'B') {
+                    $('.ui.modal.beckley')
+                        .modal('show')
+                    ;
+                }
+            }
+        </script>
+        <style>
+            a {
+                color: black;
+            }
+            a:hover {
+                color: black;
+                text-decoration: underline;
+            }
+            u {
+                text-decoration: underline;
+            }
+        </style>
         <title>TutorManager</title>
     </head>
     <body>
@@ -91,7 +128,6 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                         </select>
                         <select class="ui selection dropdown" name="location">
                             <option value="all">All Locations</option>
-                            <option <?php if (htmlspecialchars($_GET['location']) == 'GRIP') {echo 'selected';} ?> value="GRIP">GRIP Center</option>
                             <option <?php if (htmlspecialchars($_GET['location']) == 'Library') {echo 'selected';} ?> value="Library">Library</option>
                             <option <?php if (htmlspecialchars($_GET['location']) == 'Student Center') {echo 'selected';} ?> value="Student Center">Student Center Study Lounge</option>
                             <option <?php if (htmlspecialchars($_GET['location']) == 'Beckley') {echo 'selected';} ?> value="Beckley">Beckley Campus</option>
@@ -101,10 +137,10 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                             <?php
                                 foreach (getAllTutors() as $tutor) {
                                     echo '<option ';
-                                    if (htmlspecialchars($_GET['tutor']) == $tutor->firstName . ' ' . $tutor->lastName) {
+                                    if (htmlspecialchars($_GET['tutor']) == $tutor->firstName . ' ' . mb_substr($tutor->lastName, 0, 1, 'utf-8')) {
                                         echo 'selected';
                                     }
-                                    echo ' value="' . $tutor->firstName . ' ' . $tutor->lastName . '">' . $tutor->firstName . ' ' . $tutor->lastName . '</option>';
+                                    echo ' value="' . $tutor->firstName . ' ' . mb_substr($tutor->lastName, 0, 1, 'utf-8') . '">' . $tutor->firstName . ' ' . mb_substr($tutor->lastName, 0, 1, 'utf-8') . '</option>';
                                 }
                             ?>
                         </select>
@@ -136,6 +172,51 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                     </tbody>
                 </table>
             </div>
-        <div>
+        </div>
+
+        <!-- modals -->
+        <!-- need a way to reduce duplication between these modals.  Something like Angular would be ideal but unfortunately this project wasn't build with it from the ground up and it would be wasteful to use it just for this.  PHP function is another option but also could get ugly with HTML involved.  Need to come back to this later. -->
+        <div class="ui longer modal library">
+            <i class="close icon"></i>
+            <div class="header">
+                Library
+            </div>
+            <div class="image content">
+                <div class="ui medium square image">
+                    <img src="/data/locations/library/image.jpg">
+                </div>
+                <div class="description">
+                    <p><?php echo file_get_contents('data/locations/library/description.txt');?></p>
+                </div>
+            </div>
+        </div>
+        <div class="ui longer modal studentCenter">
+            <i class="close icon"></i>
+            <div class="header">
+                Student Center
+            </div>
+            <div class="image content">
+                <div class="ui medium square image">
+                    <img src="/data/locations/studentCenter/image.jpg">
+                </div>
+                <div class="description">
+                    <p><?php echo file_get_contents('data/locations/studentCenter/description.txt');?></p>
+                </div>
+            </div>
+        </div>
+        <div class="ui longer modal beckley">
+            <i class="close icon"></i>
+            <div class="header">
+                Beckley
+            </div>
+            <div class="image content">
+                <div class="ui medium square image">
+                    <img src="/data/locations/beckley/image.jpg">
+                </div>
+                <div class="description">
+                    <p><?php echo file_get_contents('data/locations/beckley/description.txt');?></p>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

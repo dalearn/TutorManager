@@ -1,3 +1,3 @@
-﻿First Name,Last Name,Time 1,Time 2,etc…,"Format: day (M/T/W/R)-start time (24-hr)-end time(24 hr)-location code (G=GRIP, L=Library, S=Student Center Lounge, B=Beckley)-Study Group Name (optional)"
-William,Allen,T-15:00-18:00-G,R-13:00-16:00-G-CHEM 101 Study Group,,
-John,Doe,M-10:00-11:00-L,W-13:00-14:00-S,R-12:00-14:00-G,
+﻿First Name,Last Name,Time 1,Time 2,etc…,"Format: day (M/T/W/R)-start time (24-hr)-end time(24 hr)-location code (L=Library, S=Student Center Lounge, B=Beckley)-Study Group Name (optional)"
+William,Allen,T-15:00-18:00-L,R-13:00-16:00-S-CHEM 101 Study Group,,
+John,Doe,M-10:00-11:00-L,W-13:00-14:00-S,R-12:00-14:00-S,
