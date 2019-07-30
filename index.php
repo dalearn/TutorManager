@@ -30,23 +30,32 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
 
             if ($tutor->location == locationNameToCode() || htmlspecialchars($_GET['location']) == 'all' || htmlspecialchars($_GET['location']) == NULL) {// check if location matches selections in location selection menu
                 if (htmlspecialchars($_GET['tutor']) == ($tutor->firstName . ' ' . mb_substr($tutor->lastName, 0, 1, 'utf-8')) || htmlspecialchars($_GET['tutor']) == 'all' || htmlspecialchars($_GET['tutor']) == NULL) {// search by tutor name
-                    if (!(!$L && !$S && !$B)) {
-                        $text .= '<br>';
-                    }
 
                     if ($tutor->location == 'L' && !$L){//these are pretty ugly and could be combined with the locationNameToCode() function somehow.
+                        if (!(!$L && !$S && !$B)) {// don't put newline before first location, otherwise put newline
+                            $text .= '<br>';
+                        }
                         $text .= '<b><a onclick="showLocationModal(\'L\')">Library:</a></b><br>';
                         $L = true;
                     }
                     else if ($tutor->location == 'S' && !$S){
+                        if (!(!$L && !$S && !$B)) {// don't put newline before first location, otherwise put newline
+                            $text .= '<br>';
+                        }
                         $text .= '<b><a onclick="showLocationModal(\'S\')">Student Center Lounge:</a></b><br>';
                         $S = true;
                     }
                     else if ($tutor->location == 'B' && !$B){
+                        if (!(!$L && !$S && !$B)) {// don't put newline before first location, otherwise put newline
+                            $text .= '<br>';
+                        }
                         $text .= '<b><a onclick="showLocationModal(\'B\')">Beckley Campus:</a></b><br>';
                         $B = true;
                     }
-                    $text .= "<b>" . $tutor->firstName . ' ' . mb_substr($tutor->lastName, 0, 1, 'utf-8') . ':</b> ';
+                    else {
+                        mb_substr($text, 0, 3, 'utf-8');
+                    }
+                    $text .= '<b><a onclick="showNameModal(\'' . $tutor->firstName . '\',\'' . mb_substr($tutor->lastName, 0, 1, 'utf-8') . '\')">' . $tutor->firstName . ' ' . mb_substr($tutor->lastName, 0, 1, 'utf-8') . ':</a></b> ';
                     if ($tutor->studyGroupName != NULL) {
                         $text .= $tutor->studyGroupName;
                     }
@@ -92,6 +101,11 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                         .modal('show')
                     ;
                 }
+            }
+            function showNameModal(firstName, lastInitial) {
+                $('.ui.modal.' + firstName + lastInitial)
+                    .modal('show')
+                ;
             }
         </script>
         <style>
@@ -196,7 +210,7 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                 Student Center
             </div>
             <div class="image content">
-                <div class="ui medium square image">
+                <div class="ui big rounded image">
                     <img src="/data/locations/studentCenter/image.jpg">
                 </div>
                 <div class="description">
@@ -218,5 +232,54 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                 </div>
             </div>
         </div>
+        <!-- tutor description modals -->
+        <!-- these are even worse than the previous ones since they don't load data from the server and involve a lot of duplication.  In reality, Angular would be best here but the file would still be bigger than all of these put together.-->
+        <?php
+            foreach (getAllTutors() as $tutor) {
+                $courses = '';
+                foreach ($tutor->courses as $course) {// generate list of courses
+                    if ($course != NULL) {
+                        $courses .= ' ' . $course . ',';
+                    }
+                }
+                $courses = rtrim($courses, ',');// remove trailing commas.
+
+                $times = '';
+                foreach ($tutor->times as $timeSlot) {// generate list of timeslots
+                    if ($timeSlot->day == 'M') {
+                        $times .= 'Monday ';
+                    }
+                    else if ($timeSlot->day == 'T') {
+                        $times .= 'Tuesday ';
+                    }
+                    else if ($timeSlot->day == 'W') {
+                        $times .= 'Wednesday ';
+                    }
+                    else if ($timeSlot->day == 'R') {
+                        $times .= 'Thursday ';
+                    }
+                    $times .= ltrim(date('h:i A', strtotime($timeSlot->startTime . ':00')), '0') . ' - ' . ltrim(date('h:i A', strtotime($timeSlot->endTime . ':00')), '0') . '<br>';
+                }
+
+                echo '
+                <div class="ui longer modal ' . $tutor->firstName . mb_substr($tutor->lastName, 0, 1, 'utf-8') . '">
+                    <i class="close icon"></i>
+                    <div class="header">
+                        ' . $tutor->firstName . ' ' . mb_substr($tutor->lastName, 0, 1, 'utf-8') . '.
+                    </div>
+                    <div class="image content">
+                        <div class="ui medium square image">
+                            <img src="/data/locations/beckley/image.jpg">
+                        </div>
+                        <div class="description">
+                            <div class="ui header">Courses Available for Tutoring</div>
+                            <p>' . $courses . '</p>
+                            <div class="ui header">Available Times</div>
+                            <p>' . $times . '</p>
+                        </div>
+                    </div>
+                </div>';
+            }
+         ?>
     </body>
 </html>
