@@ -185,6 +185,11 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                         ?>
                     </tbody>
                 </table>
+                <p>
+                    <?php
+                        echo $config->pageText;
+                     ?>
+                </p>
             </div>
         </div>
 
@@ -233,7 +238,7 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
             </div>
         </div>
         <!-- tutor description modals -->
-        <!-- these are even worse than the previous ones since they don't load data from the server and involve a lot of duplication.  In reality, Angular would be best here but the file would still be bigger than all of these put together.-->
+        <!-- these are even worse than the previous ones since they don't load data from the server and involve a lot of duplication.  In reality, Angular would be best here but the angular file would still be bigger than all of these put together and would require a complete re-write of much of the project.-->
         <?php
             foreach (getAllTutors() as $tutor) {
                 $courses = '';
@@ -258,7 +263,7 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                     else if ($timeSlot->day == 'R') {
                         $times .= 'Thursday ';
                     }
-                    $times .= ltrim(date('h:i A', strtotime($timeSlot->startTime . ':00')), '0') . ' - ' . ltrim(date('h:i A', strtotime($timeSlot->endTime . ':00')), '0') . '<br>';
+                    $times .= ltrim(date('h:i A', strtotime($timeSlot->startTime . ':00')), '0') . ' - ' . ltrim(date('h:i A', strtotime($timeSlot->endTime . ':00')), '0') . '<br>';//make times look pretty
                 }
 
                 echo '
@@ -269,12 +274,12 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                     </div>
                     <div class="image content">
                         <div class="ui medium square image">
-                            <img src="/data/locations/beckley/image.jpg">
+                            <img src="/data/tutors/' . $tutor->firstName . mb_substr($tutor->lastName, 0, 1, 'utf-8') . '.jpg">
                         </div>
                         <div class="description">
-                            <div class="ui header">Courses Available for Tutoring</div>
+                            <div class="ui header">Courses</div>
                             <p>' . $courses . '</p>
-                            <div class="ui header">Available Times</div>
+                            <div class="ui header">Tutoring Times</div>
                             <p>' . $times . '</p>
                         </div>
                     </div>
