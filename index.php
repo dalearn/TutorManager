@@ -30,26 +30,25 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
 
             if ($tutor->location == locationNameToCode() || htmlspecialchars($_GET['location']) == 'all' || htmlspecialchars($_GET['location']) == NULL) {// check if location matches selections in location selection menu
                 if (htmlspecialchars($_GET['tutor']) == ($tutor->firstName . ' ' . mb_substr($tutor->lastName, 0, 1, 'utf-8')) || htmlspecialchars($_GET['tutor']) == 'all' || htmlspecialchars($_GET['tutor']) == NULL) {// search by tutor name
-
                     if ($tutor->location == 'L' && !$L){//these are pretty ugly and could be combined with the locationNameToCode() function somehow.
                         if (!(!$L && !$S && !$B)) {// don't put newline before first location, otherwise put newline
                             $text .= '<br>';
                         }
-                        $text .= '<b><a onclick="showLocationModal(\'L\')">Library:</a></b><br>';
+                        $text .= '<b style="font-size: 1.2rem;"><a onclick="showLocationModal(\'L\')">Library:</a></b><br>';
                         $L = true;
                     }
                     else if ($tutor->location == 'S' && !$S){
                         if (!(!$L && !$S && !$B)) {// don't put newline before first location, otherwise put newline
                             $text .= '<br>';
                         }
-                        $text .= '<b><a onclick="showLocationModal(\'S\')">Student Center Lounge:</a></b><br>';
+                        $text .= '<b style="font-size: 1.2rem;"><a onclick="showLocationModal(\'S\')">Student Center Lounge:</a></b><br>';
                         $S = true;
                     }
                     else if ($tutor->location == 'B' && !$B){
                         if (!(!$L && !$S && !$B)) {// don't put newline before first location, otherwise put newline
                             $text .= '<br>';
                         }
-                        $text .= '<b><a onclick="showLocationModal(\'B\')">Beckley Campus:</a></b><br>';
+                        $text .= '<b style="font-size: 1.2rem;"><a onclick="showLocationModal(\'B\')">Beckley Campus:</a></b><br>';
                         $B = true;
                     }
                     else {
@@ -128,6 +127,7 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
             <div class="ui segment">
                 <div class="ui segment">
                     <form action="" method="get">
+                        <button class="ui icon button" type="submit" style="margin-right: 0.7rem;"><i class="search icon"></i></button>
                         <select class="ui selection dropdown" name="course">
                             <option value="all">All Courses</option>
                             <?php
@@ -158,7 +158,6 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                                 }
                             ?>
                         </select>
-                        <button class="ui right floated primary button" type="submit">Filter</button>
                     </form>
                 </div>
                 <table class="ui unstackable celled striped definition table">
@@ -175,7 +174,7 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                         <?php
                             for ($i = 10; $i <= 22; $i++) {// i = hour (24-hr time)
                                 echo "<tr>
-                                    <td class=\"center aligned\">" . ltrim(date('h:i A', strtotime($i . ':00')), '0') . "</td>
+                                    <td class=\"center aligned\">" . ltrim(date('h:i', strtotime($i . ':00')), '0') . "</td>
                                     <td>" . generateTableCell('M', $i) . "</td>
                                     <td>" . generateTableCell('T', $i) . "</td>
                                     <td>" . generateTableCell('W', $i) . "</td>
