@@ -64,15 +64,15 @@ function getAllTutors() {// This function gets called a lot.  It may be necessar
     foreach ($tutorData as $line) {// this could be prettier.  Also could benefit from additional validation.
         $tutor = new Tutor;
         if (strlen($line[0]) > 0) {// First Name
-            $tutor->firstName = $line[0];
+            $tutor->firstName = str_replace(' ', '', $line[0]);
             if (strlen($line[1]) > 0) {// Last Name
-                $tutor->lastName = $line[1];
+                $tutor->lastName = str_replace(' ', '', $line[1]);
                 foreach (array_slice($line, 2) as $course) {// individual courses
                     $course = rtrim($course);//remove any whitespace that may sneak into the file such as newlines or trailing spaces
                     array_push($tutor->courses, $course);
                 }
                 foreach ($timeData as $timeRow) {
-                    if ($timeRow[0] == $tutor->firstName && $timeRow[1] == $tutor->lastName) {// check if name matches the current tutor being processed
+                    if (str_replace(' ', '', $timeRow[0]) == $tutor->firstName && str_replace(' ', '', $timeRow[1]) == $tutor->lastName) {// check if name matches the current tutor being processed
                         foreach (array_slice($timeRow, 2) as $timeString) {// individual times
                             $timeSlot = new TimeSlot;
                             if ($timeSlot->set($timeString) != false) {// check if value was able to be parsed
