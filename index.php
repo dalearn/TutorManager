@@ -201,7 +201,7 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
             </div>
             <div class="image content">
                 <div class="ui medium square image">
-                    <img src="/data/locations/library/image.jpg">
+                    <img src="data/locations/library/image.jpg">
                 </div>
                 <div class="description">
                     <p><?php echo file_get_contents('data/locations/library/description.txt');?></p>
@@ -215,7 +215,7 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
             </div>
             <div class="image content">
                 <div class="ui big rounded image">
-                    <img src="/data/locations/studentCenter/image.jpg">
+                    <img src="data/locations/studentCenter/image.jpg">
                 </div>
                 <div class="description">
                     <p><?php echo file_get_contents('data/locations/studentCenter/description.txt');?></p>
@@ -229,7 +229,7 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
             </div>
             <div class="image content">
                 <div class="ui medium square image">
-                    <img src="/data/locations/beckley/image.jpg">
+                    <img src="data/locations/beckley/image.jpg">
                 </div>
                 <div class="description">
                     <p><?php echo file_get_contents('data/locations/beckley/description.txt');?></p>
@@ -273,7 +273,7 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                     </div>
                     <div class="image content">
                         <div class="ui medium square image">
-                            <img src="/data/tutors/' . $tutor->firstName . mb_substr($tutor->lastName, 0, 1, 'utf-8') . '.jpg">
+                            <img src="data/tutors/' . $tutor->firstName . mb_substr($tutor->lastName, 0, 1, 'utf-8') . '.jpg">
                         </div>
                         <div class="description">
                             <div class="ui header">Courses</div>
