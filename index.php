@@ -34,21 +34,21 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                         if (!(!$L && !$S && !$B)) {// don't put newline before first location, otherwise put newline
                             $text .= '<br>';
                         }
-                        $text .= '<b style="font-size: 1.2rem;"><a onclick="showLocationModal(\'L\')">Library:</a></b><br>';
+                        $text .= '<b style="font-size: 1.3rem;"><a onclick="showLocationModal(\'L\')">Library:</a></b><br>';
                         $L = true;
                     }
                     else if ($tutor->location == 'S' && !$S){
                         if (!(!$L && !$S && !$B)) {// don't put newline before first location, otherwise put newline
                             $text .= '<br>';
                         }
-                        $text .= '<b style="font-size: 1.2rem;"><a onclick="showLocationModal(\'S\')">Student Center Lounge:</a></b><br>';
+                        $text .= '<b style="font-size: 1.3rem;"><a onclick="showLocationModal(\'S\')">Student Center Lounge:</a></b><br>';
                         $S = true;
                     }
                     else if ($tutor->location == 'B' && !$B){
                         if (!(!$L && !$S && !$B)) {// don't put newline before first location, otherwise put newline
                             $text .= '<br>';
                         }
-                        $text .= '<b style="font-size: 1.2rem;"><a onclick="showLocationModal(\'B\')">Beckley Campus:</a></b><br>';
+                        $text .= '<b style="font-size: 1.3rem;"><a onclick="showLocationModal(\'B\')">Beckley Campus:</a></b><br>';
                         $B = true;
                     }
                     else {
@@ -122,7 +122,7 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
         <title>TutorManager</title>
     </head>
     <body>
-        <div class="ui container" style="margin-top: 1.5em;">
+        <div class="ui container" style="margin-top: 1.5em; margin-bottom: 1.5em;">
             <h1 class="ui header"><?php echo $config->semesterName ?> Drop-In Tutoring Schedule</h1>
             <div class="ui segment">
                 <div class="ui segment">
@@ -184,11 +184,11 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                         ?>
                     </tbody>
                 </table>
-                <p>
+                <div class="ui segment">
                     <?php
                         echo $config->pageText;
                      ?>
-                </p>
+                </div>
             </div>
         </div>
 
