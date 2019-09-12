@@ -9,7 +9,7 @@ class TimeSlot {
 
     public function set($input) {// takes data in format: day-start time-end time-location code.  Could benefit from more error-checking
         $data = explode('-', $input);
-        if ($data[0] == 'M' || $data[0] == 'T' || $data[0] == 'W' || $data[0] == 'R') {// make sure day is valid
+        if ($data[0] == 'M' || $data[0] == 'T' || $data[0] == 'W' || $data[0] == 'R' || $data[0] == 'F') {// make sure day is valid
             $this->day = $data[0];
         }
         else {
@@ -103,7 +103,7 @@ function getAllCourses() {
     return $courses;
 }
 
-function selectTutorsByTime($day, $startTime, $endTime) {// day: M/T/W/R, start/end time: 24-hr
+function selectTutorsByTime($day, $startTime, $endTime) {// day: M/T/W/R/F, start/end time: 24-hr
     $selection = array();
     $tutors = getAllTutors();
     foreach ($tutors as $tutor) {

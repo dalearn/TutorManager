@@ -56,7 +56,7 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                     }
                     $text .= '<b><a onclick="showNameModal(\'' . $tutor->firstName . '\',\'' . mb_substr($tutor->lastName, 0, 1, 'utf-8') . '\')">' . $tutor->firstName . ' ' . mb_substr($tutor->lastName, 0, 1, 'utf-8') . ':</a></b> ';
                     if ($tutor->studyGroupName != NULL) {
-                        $text .= $tutor->studyGroupName;
+                        $text .= '<div class="ui red label">' . $tutor->studyGroupName . "</div>";
                     }
                     else {
                         foreach ($tutor->courses as $course) {
@@ -118,6 +118,10 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
             u {
                 text-decoration: underline;
             }
+            .ui.medium.image {
+                height: 300px;
+                width: 300px;
+            }
         </style>
         <title>TutorManager</title>
     </head>
@@ -125,6 +129,11 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
         <div class="ui container" style="margin-top: 1.5em; margin-bottom: 1.5em;">
             <h1 class="ui header"><?php echo $config->semesterName ?> Drop-In Tutoring Schedule</h1>
             <div class="ui segment">
+                <div class="ui segment">
+                    <?php
+                        echo $config->pageText;
+                     ?>
+                </div>
                 <div class="ui segment">
                     <form action="" method="get">
                         <button class="ui icon button" type="submit" style="margin-right: 0.7rem;"><i class="search icon"></i></button>
@@ -185,9 +194,69 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                     </tbody>
                 </table>
                 <div class="ui segment">
+                    <h2>Alternate Tutoring Opportunities:</h2>
                     <?php
-                        echo $config->pageText;
-                     ?>
+                        $selection = selectTutorsByTime("F", 10, 22);
+
+                        $L = false;// used to tell if that location has already been entered.
+                        $S = false;
+                        $B = false;
+
+                        $text = '';
+                        foreach ($selection as $tutor) {
+                            if (in_array(htmlspecialchars($_GET['course']), $tutor->courses) || htmlspecialchars($_GET['course']) == 'all' || htmlspecialchars($_GET['course']) == NULL) {// return based on value of course selection menu
+
+                                if ($tutor->location == locationNameToCode() || htmlspecialchars($_GET['location']) == 'all' || htmlspecialchars($_GET['location']) == NULL) {// check if location matches selections in location selection menu
+                                    if (htmlspecialchars($_GET['tutor']) == ($tutor->firstName . ' ' . mb_substr($tutor->lastName, 0, 1, 'utf-8')) || htmlspecialchars($_GET['tutor']) == 'all' || htmlspecialchars($_GET['tutor']) == NULL) {// search by tutor name
+                                        if ($tutor->location == 'L' && !$L){//these are pretty ugly and could be combined with the locationNameToCode() function somehow.
+                                            if (!(!$L && !$S && !$B)) {// don't put newline before first location, otherwise put newline
+                                                $text .= '<br>';
+                                            }
+                                            $text .= '<b style="font-size: 1.3rem;"><a onclick="showLocationModal(\'L\')">Library:</a></b><br>';
+                                            $L = true;
+                                        }
+                                        else if ($tutor->location == 'S' && !$S){
+                                            if (!(!$L && !$S && !$B)) {// don't put newline before first location, otherwise put newline
+                                                $text .= '<br>';
+                                            }
+                                            $text .= '<b style="font-size: 1.3rem;"><a onclick="showLocationModal(\'S\')">Student Center Lounge:</a></b><br>';
+                                            $S = true;
+                                        }
+                                        else if ($tutor->location == 'B' && !$B){
+                                            if (!(!$L && !$S && !$B)) {// don't put newline before first location, otherwise put newline
+                                                $text .= '<br>';
+                                            }
+                                            $text .= '<b style="font-size: 1.3rem;"><a onclick="showLocationModal(\'B\')">Beckley Campus:</a></b><br>';
+                                            $B = true;
+                                        }
+                                        else {
+                                            mb_substr($text, 0, 3, 'utf-8');
+                                        }
+                                        $text .= '<b><a onclick="showNameModal(\'' . $tutor->firstName . '\',\'' . mb_substr($tutor->lastName, 0, 1, 'utf-8') . '\')">' . $tutor->firstName . ' ' . mb_substr($tutor->lastName, 0, 1, 'utf-8') . ':</a></b> ';
+                                        foreach ($tutor->times as $timeSlot) {
+                                            $text .= $timeSlot->startTime . ":00 - " . $timeSlot->endTime . ":00, ";
+                                        }
+                                        $text = rtrim($text, ', ');// remove trailing commas.
+                                        $text .= "<br>";
+                                        if ($tutor->studyGroupName != NULL) {
+                                            $text .= $tutor->studyGroupName;
+                                        }
+                                        else {
+                                            foreach ($tutor->courses as $course) {
+                                                if ($course != NULL) {
+                                                    $text .= ' ' . $course . ',';
+                                                }
+                                            }
+                                        }
+                                        $text = rtrim($text, ',');// remove trailing commas.
+                                        $text .= '<br>';
+                                    }
+                                }
+                            }
+                        }
+                        $text = rtrim($text, '<br>');//remove trailing <br>
+                        echo $text;
+                    ?>
                 </div>
             </div>
         </div>
@@ -200,9 +269,7 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                 Library
             </div>
             <div class="image content">
-                <div class="ui medium square image">
-                    <img src="data/locations/library/image.jpg">
-                </div>
+                <img class="ui medium rounded image" src="data/locations/library/image.jpg">
                 <div class="description">
                     <p><?php echo file_get_contents('data/locations/library/description.txt');?></p>
                 </div>
@@ -214,9 +281,7 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                 Student Center
             </div>
             <div class="image content">
-                <div class="ui big rounded image">
-                    <img src="data/locations/studentCenter/image.jpg">
-                </div>
+                <img class="ui medium rounded image" src="data/locations/studentCenter/image.jpg">
                 <div class="description">
                     <p><?php echo file_get_contents('data/locations/studentCenter/description.txt');?></p>
                 </div>
@@ -228,9 +293,7 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                 Beckley
             </div>
             <div class="image content">
-                <div class="ui medium square image">
-                    <img src="data/locations/beckley/image.jpg">
-                </div>
+                <img class="ui medium rounded image" src="data/locations/beckley/image.jpg">
                 <div class="description">
                     <p><?php echo file_get_contents('data/locations/beckley/description.txt');?></p>
                 </div>
@@ -272,9 +335,7 @@ function generateTableCell($day, $timeSlot) {// generate the actual text to go i
                         ' . $tutor->firstName . ' ' . mb_substr($tutor->lastName, 0, 1, 'utf-8') . '.
                     </div>
                     <div class="image content">
-                        <div class="ui medium square image">
-                            <img src="data/tutors/' . $tutor->firstName . mb_substr($tutor->lastName, 0, 1, 'utf-8') . '.jpg">
-                        </div>
+                        <img class="ui medium rounded image" src="data/tutors/' . $tutor->firstName . mb_substr($tutor->lastName, 0, 1, 'utf-8') . '.jpg">
                         <div class="description">
                             <div class="ui header">Courses</div>
                             <p>' . $courses . '</p>
